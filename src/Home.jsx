@@ -1,25 +1,26 @@
 import { useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 function Home() {
-
-
+  const windowLocation = window.location;
+  console.log(windowLocation)
   const isAuthenticated = Boolean(localStorage.getItem('access_token'))
   const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('manual_token');
     window.location.reload();
   }
   const openLoginOAuthPopup = (platform) => {
+    const { href, search } = window.location;
+    const hrefWithoutSearch = href.replace(search,"");    
     const width = 500;
     const height = 600;
     // Calculate the center position
     const left = window.innerWidth / 2 - width / 2;
     const top = window.innerHeight / 2 - height / 2;
 
-    window.open('http://localhost:3000/popup/oauth?platform=' + platform, "_blank", `width=${width},height=${height},left=${left},top=${top}`);
+    window.open(`${hrefWithoutSearch}popup/oauth?platform=${platform}`, "_blank", `width=${width},height=${height},left=${left},top=${top}`);
 
     // Trong trang hiện tại (cửa sổ cha)
     const handlePostMessage = (event) => {
@@ -31,7 +32,7 @@ function Home() {
         // Kiểm tra loại dữ liệu
         if (data.type === 'authentication') {
           const authorizationCode = data.data;
-
+          localStorage.setItem('manual_token', authorizationCode.manual_token)
           // Gửi mã code lên server để lấy token và thông tin người dùng
           // Thực hiện các xử lý tại đây
 
